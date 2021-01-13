@@ -9,7 +9,7 @@
 
 ## Cara Akses
 1. PHP Migrate 
-2. Jalankan URL createall untuk input seuma isi table
+2. Jalankan URL createall untuk input semua isi table
 
 ## About Laravel
 
