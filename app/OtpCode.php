@@ -21,6 +21,6 @@ class OtpCode extends Model
     }
 
     protected $fillable = [
-        'id', 'name',
+        'id', 'otp', 'user_id', 'valid_until'
     ];
 }
