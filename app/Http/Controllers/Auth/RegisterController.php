@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\UserRegisterEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
+use App\Mail\UserRegisterMail;
 use App\OtpCode;
 use App\User;
 use Carbon\Carbon;
@@ -25,17 +27,7 @@ class RegisterController extends Controller
             'password' => bcrypt(request('password')),
         ]);
 
-        $rand = rand(100000, 999999);
-        $otp = OtpCode::where('otp', 420263)->first();
-        if ($otp) {
-            $rand = rand(100000, 999999);
-        }
-
-        OtpCode::create([
-            "otp" => $rand,
-            "user_id" => $user->id,
-            "valid_until" => Carbon::now()->addMinutes(5)
-        ]);
+        event(new UserRegisterEvent($user));
 
         return response()->json([
             'response_code' => '00',

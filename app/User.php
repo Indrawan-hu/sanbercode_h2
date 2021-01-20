@@ -7,6 +7,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Traits\UsesUuid;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable implements JWTSubject
@@ -25,6 +26,10 @@ class User extends Authenticatable implements JWTSubject
 
         static::creating(function ($modal) {
             $modal->role_id = $modal->get_user_role_id();
+        });
+
+        static::created(function ($modal) {
+            $modal->generate_otp_code();
         });
     }
 
@@ -77,6 +82,20 @@ class User extends Authenticatable implements JWTSubject
     public function role()
     {
         return $this->belongsTo('App\Role');
+    }
+
+
+    public function generate_otp_code()
+    {
+        do {
+            $rand = rand(100000, 999999);
+            $otp = OtpCode::where('otp', $rand)->first();
+        } while ($otp);
+
+        OtpCode::updateOrCreate(
+            ["user_id" => $this->id],
+            ["otp" => $rand, "valid_until" => Carbon::now()->addMinutes(5)]
+        );
     }
 
     /**

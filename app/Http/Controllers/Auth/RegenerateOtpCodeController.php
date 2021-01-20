@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Events\UserRegisterEvent;
 use App\Http\Controllers\Controller;
 use App\OtpCode;
 use Illuminate\Http\Request;
@@ -30,8 +31,9 @@ class RegenerateOtpCodeController extends Controller
             ], 200);
         }
 
-        OtpCode::where("user_id", $user->id)
-            ->update(['otp' => rand(100000, 999999), "valid_until" => Carbon::now()->addMinutes(5)]);
+        $user->generate_otp_code();
+
+        event(new UserRegisterEvent($user));
 
         return response()->json([
             'response_code' => '00',
